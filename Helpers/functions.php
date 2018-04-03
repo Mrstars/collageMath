@@ -56,7 +56,8 @@ function get_session_user()
 function get_session_user_id()
 {
     $user = session("user");
-    return $user ? $user->user_login : 0;
+
+    return $user ? 1 : 0;
 }
 
 function get_wx_user_openid()
