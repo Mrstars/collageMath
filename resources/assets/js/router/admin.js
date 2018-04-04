@@ -29,7 +29,11 @@ export default new VueRouter({
             name: '菜单配置',
             path: '/wx/menu',
             component: resolve =>void(require(['../components/admin/wx/menu.vue'], resolve))
-        },
+        },{
+            name:'bookList',
+                path:'/wx/bookList',
+        component: resolve =>void(require(['../components/admin/book/bookList.vue'], resolve))
+        }
     ]
 })
 

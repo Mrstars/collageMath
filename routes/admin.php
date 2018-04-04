@@ -33,6 +33,11 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/user/menu/get', 'Admin\WeixinController@get_wx_user_mennu');
     });
 
+    Route::group(['prefix' => 'book'],function (){
+        Route::get('getList','Admin\book\bookController@getList');
+        Route::post('delete','Admin\book\bookController@delBook');
+    });
+
 });
 /*Route::group(['prefix' => 'weixin'], function () {
     Route::post("/config/set", 'Admin\WeixinController@set_config');
