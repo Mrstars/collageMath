@@ -36,6 +36,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'book'],function (){
         Route::get('getList','Admin\book\bookController@getList');
         Route::post('delete','Admin\book\bookController@delBook');
+        Route::post('upload','Admin\book\bookController@upload');
+        Route::get('getBook','Admin\book\bookController@getBook');
+        Route::post('update','Admin\book\bookController@updatebook');
     });
 
 });

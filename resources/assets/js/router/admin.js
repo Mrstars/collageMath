@@ -33,6 +33,10 @@ export default new VueRouter({
             name:'bookList',
                 path:'/wx/bookList',
         component: resolve =>void(require(['../components/admin/book/bookList.vue'], resolve))
+        },{
+            name:'book',
+            path:'/wx/book',
+            component: resolve =>void(require(['../components/admin/book/book.vue'], resolve))
         }
     ]
 })
