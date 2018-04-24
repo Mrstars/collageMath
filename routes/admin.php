@@ -41,6 +41,19 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('update','Admin\book\bookController@updatebook');
     });
 
+    Route::group(['prefix'=>'ppt','namespace'=>'Admin\ppt'],function (){
+        Route::get('getList','pptController@getList');
+        Route::post('delete','pptController@delPpt');
+        Route::post('upload','pptController@upload');
+        Route::get('getPpt','pptController@getPpt');
+    });
+
+    Route::group(['prefix'=>'vedio','namespace'=>'Admin\vedio'],function (){
+        Route::get('getList','vedioController@getList');
+        Route::post('delete','vedioController@delVedio');
+    });
+
+
 });
 /*Route::group(['prefix' => 'weixin'], function () {
     Route::post("/config/set", 'Admin\WeixinController@set_config');

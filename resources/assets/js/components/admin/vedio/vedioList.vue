@@ -4,7 +4,7 @@
             <span class="el-breadcrumb__item__inner"><i class="ion-ios-home gm-home"></i>当前位置：</span>
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>智慧数学后台</el-breadcrumb-item>
-                <el-breadcrumb-item>教材列表</el-breadcrumb-item>
+                <el-breadcrumb-item>视频列表</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
 
@@ -49,18 +49,18 @@
                     width="55">
             </el-table-column>
             <el-table-column
-                    prop="book_name"
+                    prop="video_name"
                     label="名称"
                     width="540">
             </el-table-column>
             <el-table-column
-                    prop="book_author"
-                    label="作者"
+                    prop="video_wirter"
+                    label="上传者"
                     width="180">
             </el-table-column>
             <el-table-column
-                    prop="recommended"
-                    label="点赞数"
+                    prop="pageviews"
+                    label="浏览数"
                     width="180">
             </el-table-column>
             <el-table-column
@@ -205,7 +205,7 @@
             handleEdit(index, row) {
                 this.dlShow = true;
                 let bookId = this.tableData[index].id
-                axios.get('/admin/book/getBook?id=' + bookId).then(res => {
+                axios.get('/admin/vedio/getVedio?id=' + bookId).then(res => {
                     if (res.data.code == 0) {
                         this.imageUrl = '/storage/avatars/'+res.data.result.book_img;
                         this.csrf_token.name = res.data.result.book_name;
@@ -237,7 +237,7 @@
             },
 
             delete(id) {
-                axios.post('/admin/book/delete', {
+                axios.post('/admin/vedio/delete', {
                     id: id
                 }).then(res => {
                     if (res.data.code == 0) {
@@ -256,7 +256,7 @@
             getPage(page = 1) {
                 this.page = page;
                 this.loading = true;
-                axios.get('/admin/book/getList?page=' + page).then(
+                axios.get('/admin/vedio/getList?page=' + page).then(
                     res => {
 
                         if (res.data.code == 0) {

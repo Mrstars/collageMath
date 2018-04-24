@@ -4,21 +4,22 @@
             <span class="el-breadcrumb__item__inner"><i class="ion-ios-home gm-home"></i>当前位置：</span>
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>智慧数学后台</el-breadcrumb-item>
-                <el-breadcrumb-item>添加教材</el-breadcrumb-item>
+                <el-breadcrumb-item>添加ppt</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <el-upload
                 ref="upload"
-                class="avatar-uploader"
-                action="/admin/book/upload"
+                class="upload-demo"
+                drag
+                action="/admin/ppt/upload"
                 :data="csrf_token"
-                :show-file-list="false"
                 :on-success="uploadSuccess"
                 :before-upload="beforeUpload"
-                :on-change="filechange"
-                :auto-upload="false">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                :auto-upload="false"
+                multiple>
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            <div class="el-upload__tip" slot="tip">只能上传ppt、word、pdf文件，且不超过100mb</div>
 
         </el-upload>
         <el-form label-width="80px" :model="csrf_token">
@@ -26,10 +27,10 @@
                 <el-input v-model="csrf_token.name"></el-input>
             </el-form-item>
             <el-form-item label="作者">
-                <el-input v-model="csrf_token.book_author"></el-input>
+                <el-input v-model="csrf_token.ppt_author"></el-input>
             </el-form-item>
             <el-form-item label="简介">
-                <el-input v-model="csrf_token.book_introduction"></el-input>
+                <el-input v-model="csrf_token.ppt_introduction"></el-input>
             </el-form-item>
         </el-form>
         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传信息</el-button>
@@ -97,7 +98,7 @@
                 imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', book_author: '', book_introduction: ''
+                    name: '', ppt_author: '', ppt_introduction: ''
                 },
                 judgeUpload:false
 
@@ -117,8 +118,8 @@
                     });
                     this.imageUrl = ''
                     this.csrf_token.name = ''
-                    this.csrf_token.book_author = ''
-                    this.csrf_token.book_introduction = ''
+                    this.csrf_token.ppt_author = ''
+                    this.csrf_token.ppt_introduction = ''
                 }
                 else {
                     this.$message.error(res.msg)
@@ -126,45 +127,39 @@
 
             },
             beforeUpload(file) {
-//this.upload()
 
-                const isJPG = file.type === 'image/jpeg';
-                const isLt2M = file.size / 1024 / 1024 < 2;
+                console.log(1)
+                console.log(file)
+                const isJPG = file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                    file.type === 'application/vnd.ms-powerpoint' ||
+                    file.type === 'application/msword' ||
+                    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                    file.type === 'application/pdf';
+                const isLt2M = file.size / 1024 / 1024 < 100;
                 const name = this.csrf_token.name != '';
-                const author = this.csrf_token.book_author != '';
-                const introduction = this.csrf_token.book_introduction != '';
+                const author = this.csrf_token.ppt_author != '';
+                const introduction = this.csrf_token.ppt_introduction != '';
 
                 if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!')
+                    this.$message.error('上传文件只能是 ppt、word、ptf文件 !')
                 } else if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                    this.$message.error('上传文件大小不能超过 100MB!');
                 } else if (!name) {
-                    this.$message.error('书名为空')
+                    this.$message.error('文件名为空')
                 } else if (!author) {
-                    this.$message.error('作者为空')
+                    this.$message.error('上传者为空')
                 } else if (!introduction) {
                     this.$message.error('简介为空')
                 }
 
                 return isJPG && isLt2M && name && author && introduction;
-            }, filechange(file) {
-                if(!this.judgeUpload)
-                this.imageUrl = URL.createObjectURL(file.raw);
-                else{
-                    this.imageUrl = ""
-                    this.judgeUpload = false;
-                }
-            },
-            test(){
-//                axios.post('http://www.test.com:8080/test').then(res=>{
-//                    console.log(res)
-//                })
-
             }
+
+
 
         },
         mounted() {
-            this.test()
+
         }
     }
 </script>

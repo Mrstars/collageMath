@@ -33,6 +33,11 @@ function getFilename($ext)
     return $filename;
 }
 
+function get_time(){
+    $dt = new DateTime;
+    return $dt->format('m-d-y H:i:s');
+}
+
 function get_session_user()
 {
     /*$std               = new \stdClass();

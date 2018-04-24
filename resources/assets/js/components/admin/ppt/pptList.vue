@@ -4,24 +4,24 @@
             <span class="el-breadcrumb__item__inner"><i class="ion-ios-home gm-home"></i>当前位置：</span>
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>智慧数学后台</el-breadcrumb-item>
-                <el-breadcrumb-item>教材列表</el-breadcrumb-item>
+                <el-breadcrumb-item>ppt列表</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
 
         <el-dialog :visible.sync="dlShow">
             <el-upload
-
                     ref="upload"
-                    class="avatar-uploader"
-                    action="/admin/book/update"
+                    class="upload-demo"
+                    drag
+                    action="/admin/ppt/upload"
                     :data="csrf_token"
-                    :show-file-list="false"
                     :on-success="uploadSuccess"
                     :before-upload="beforeUpload"
-                    :on-change="filechange"
-                    :auto-upload="false">
-                <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    :auto-upload="false"
+                    multiple>
+                <i class="el-icon-upload"></i>
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div class="el-upload__tip" slot="tip">只能上传ppt、word、pdf文件，且不超过100mb</div>
 
             </el-upload>
             <el-form label-width="80px" :model="csrf_token">
@@ -29,10 +29,10 @@
                     <el-input v-model="csrf_token.name"></el-input>
                 </el-form-item>
                 <el-form-item label="作者" style="width: 50%">
-                    <el-input v-model="csrf_token.book_author"></el-input>
+                    <el-input v-model="csrf_token.ppt_author"></el-input>
                 </el-form-item>
                 <el-form-item label="简介" style="width: 50%">
-                    <el-input type="textarea" v-model="csrf_token.book_introduction" resize="none"></el-input>
+                    <el-input type="textarea" v-model="csrf_token.ppt_introduction" resize="none"></el-input>
                 </el-form-item>
 
             </el-form>
@@ -49,18 +49,18 @@
                     width="55">
             </el-table-column>
             <el-table-column
-                    prop="book_name"
+                    prop="ppt_name"
                     label="名称"
                     width="540">
             </el-table-column>
             <el-table-column
-                    prop="book_author"
-                    label="作者"
+                    prop="ppt_writer"
+                    label="上传者"
                     width="180">
             </el-table-column>
             <el-table-column
-                    prop="recommended"
-                    label="点赞数"
+                    prop="download"
+                    label="下载数"
                     width="180">
             </el-table-column>
             <el-table-column
@@ -88,9 +88,12 @@
     </div>
 </template>
 <style>
+    .el-upload__tip{
+        text-align:center;
+    }
     .el-upload {
         display: block !important;
-        width: 25% !important;
+        width: 50% !important;
         margin: 0 auto !important;
     }
 
@@ -192,10 +195,9 @@
                 page: 1,
                 idList: [],
                 dlShow: false,
-                imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', book_author: '', book_introduction: '',ifUpload:false,oldFileName:'',id:0
+                    name: '', ppt_author: '', ppt_introduction: ''
                 },
                 judgeUpload: false,
 
@@ -205,13 +207,13 @@
             handleEdit(index, row) {
                 this.dlShow = true;
                 let bookId = this.tableData[index].id
-                axios.get('/admin/book/getBook?id=' + bookId).then(res => {
+                axios.get('/admin/ppt/getPpt?id=' + bookId).then(res => {
                     if (res.data.code == 0) {
-                        this.imageUrl = '/storage/avatars/'+res.data.result.book_img;
-                        this.csrf_token.name = res.data.result.book_name;
-                        this.csrf_token.book_author = res.data.result.book_author;
-                        this.csrf_token.book_introduction = res.data.result.book_introduction;
-                        this.csrf_token.oldFileName = res.data.result.book_img;
+
+                        this.csrf_token.name = res.data.result.ppt_name;
+                        this.csrf_token.ppt_author = res.data.result.ppt_writer;
+                        this.csrf_token.ppt_introduction = res.data.result.ppt_introduction;
+                        this.csrf_token.oldFileName = res.data.result.ppt_path;
                         this.csrf_token.id = bookId;
                     }
                 })
@@ -237,7 +239,7 @@
             },
 
             delete(id) {
-                axios.post('/admin/book/delete', {
+                axios.post('/admin/ppt/delete', {
                     id: id
                 }).then(res => {
                     if (res.data.code == 0) {
@@ -256,7 +258,7 @@
             getPage(page = 1) {
                 this.page = page;
                 this.loading = true;
-                axios.get('/admin/book/getList?page=' + page).then(
+                axios.get('/admin/ppt/getList?page=' + page).then(
                     res => {
 
                         if (res.data.code == 0) {
@@ -281,8 +283,8 @@
                     });
                     this.imageUrl = ''
                     this.csrf_token.name = ''
-                    this.csrf_token.book_author = ''
-                    this.csrf_token.book_introduction = ''
+                    this.csrf_token.ppt_author = ''
+                    this.csrf_token.ppt_introduction = ''
                     this.dlShow = false;
                 }
                 else {
@@ -292,33 +294,31 @@
             },
             beforeUpload(file) {
 
-                const isJPG = file.type === 'image/jpeg';
-                const isLt2M = file.size / 1024 / 1024 < 2;
+                console.log(1)
+                console.log(file)
+                const isJPG = file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                    file.type === 'application/vnd.ms-powerpoint' ||
+                    file.type === 'application/msword' ||
+                    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                    file.type === 'application/pdf';
+                const isLt2M = file.size / 1024 / 1024 < 100;
                 const name = this.csrf_token.name != '';
-                const author = this.csrf_token.book_author != '';
-                const introduction = this.csrf_token.book_introduction != '';
+                const author = this.csrf_token.ppt_author != '';
+                const introduction = this.csrf_token.ppt_introduction != '';
 
                 if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!')
+                    this.$message.error('上传文件只能是 ppt、word、ptf文件 !')
                 } else if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                    this.$message.error('上传文件大小不能超过 100MB!');
                 } else if (!name) {
-                    this.$message.error('书名为空')
+                    this.$message.error('文件名为空')
                 } else if (!author) {
-                    this.$message.error('作者为空')
+                    this.$message.error('上传者为空')
                 } else if (!introduction) {
                     this.$message.error('简介为空')
                 }
 
                 return isJPG && isLt2M && name && author && introduction;
-            }, filechange(file) {
-                this.csrf_token.ifUpload = true;
-                if (!this.judgeUpload)
-                    this.imageUrl = URL.createObjectURL(file.raw);
-                else {
-                    this.imageUrl = ""
-                    this.judgeUpload = false;
-                }
             }
         },
         mounted() {

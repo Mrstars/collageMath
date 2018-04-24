@@ -4,7 +4,7 @@
             <span class="el-breadcrumb__item__inner"><i class="ion-ios-home gm-home"></i>当前位置：</span>
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>智慧数学后台</el-breadcrumb-item>
-                <el-breadcrumb-item>添加教材</el-breadcrumb-item>
+                <el-breadcrumb-item>上传视频</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <el-upload
@@ -97,7 +97,7 @@
                 imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', book_author: '', book_introduction: ''
+                    name: '', vedio_author: '', vedio_introduction: '',link:''
                 },
                 judgeUpload:false
 
@@ -117,8 +117,9 @@
                     });
                     this.imageUrl = ''
                     this.csrf_token.name = ''
-                    this.csrf_token.book_author = ''
-                    this.csrf_token.book_introduction = ''
+                    this.csrf_token.vedio_author = ''
+                    this.csrf_token.vedio_introduction = ''
+                    this.csrf_token.link = ''
                 }
                 else {
                     this.$message.error(res.msg)
@@ -131,9 +132,9 @@
                 const isJPG = file.type === 'image/jpeg';
                 const isLt2M = file.size / 1024 / 1024 < 2;
                 const name = this.csrf_token.name != '';
-                const author = this.csrf_token.book_author != '';
-                const introduction = this.csrf_token.book_introduction != '';
-
+                const author = this.csrf_token.vedio_author != '';
+                const introduction = this.csrf_token.vedio_introduction != '';
+                const path = this.csrf_token.link != '';
                 if (!isJPG) {
                     this.$message.error('上传头像图片只能是 JPG 格式!')
                 } else if (!isLt2M) {
@@ -149,22 +150,18 @@
                 return isJPG && isLt2M && name && author && introduction;
             }, filechange(file) {
                 if(!this.judgeUpload)
-                this.imageUrl = URL.createObjectURL(file.raw);
+                    this.imageUrl = URL.createObjectURL(file.raw);
                 else{
                     this.imageUrl = ""
                     this.judgeUpload = false;
                 }
             },
             test(){
-//                axios.post('http://www.test.com:8080/test').then(res=>{
-//                    console.log(res)
-//                })
 
             }
 
         },
         mounted() {
-            this.test()
         }
     }
 </script>

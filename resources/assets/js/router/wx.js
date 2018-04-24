@@ -16,6 +16,13 @@ export default new VueRouter({
             path: '/tt',
             component: resolve =>void(require(['../components/wx/TT.vue'], resolve))
 
+        },
+        {
+
+            name: "bookList",
+                path: '/bookList',
+            component: resolve =>void(require(['../components/wx/bookList.vue'], resolve))
+
         }
     ]
 })
