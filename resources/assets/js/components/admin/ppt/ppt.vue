@@ -22,7 +22,7 @@
             <div class="el-upload__tip" slot="tip">只能上传ppt、word、pdf文件，且不超过100mb</div>
 
         </el-upload>
-        <el-form label-width="80px" :model="csrf_token">
+        <el-form label-width="80px" :model="csrf_token" style="width:50%;margin: 0 auto">
             <el-form-item label="名称">
                 <el-input v-model="csrf_token.name"></el-input>
             </el-form-item>
@@ -32,8 +32,19 @@
             <el-form-item label="简介">
                 <el-input v-model="csrf_token.ppt_introduction"></el-input>
             </el-form-item>
+            <el-form-item label="课程">
+                <!--<el-input v-model="csrf_token.class"></el-input>-->
+                <el-dropdown trigger="click" @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{this.className}}<i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="(item, index) in this.liList" :key="liList.id" :command="item.id">{{item.class_name}}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </el-form-item>
         </el-form>
-        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传信息</el-button>
+        <el-button style="margin-left: 30%;" size="small" type="success" @click="submitUpload">上传信息</el-button>
     </div>
 </template>
 <style>
@@ -98,9 +109,11 @@
                 imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', ppt_author: '', ppt_introduction: ''
+                    name: '', ppt_author: '', ppt_introduction: '',classId:0
                 },
-                judgeUpload:false
+                judgeUpload:false,
+                liList:[{id:0,name:'test'}],
+                className:'请选择课程'
 
             }
         },
@@ -122,7 +135,10 @@
                     this.csrf_token.ppt_introduction = ''
                 }
                 else {
-                    this.$message.error(res.msg)
+                    this.$message({
+                        message: res.msg,
+                        type: 'error'
+                    });
                 }
 
             },
@@ -139,7 +155,7 @@
                 const name = this.csrf_token.name != '';
                 const author = this.csrf_token.ppt_author != '';
                 const introduction = this.csrf_token.ppt_introduction != '';
-
+                const number = this.csrf_token.classId !=0
                 if (!isJPG) {
                     this.$message.error('上传文件只能是 ppt、word、ptf文件 !')
                 } else if (!isLt2M) {
@@ -150,9 +166,20 @@
                     this.$message.error('上传者为空')
                 } else if (!introduction) {
                     this.$message.error('简介为空')
+                }else if(!number){
+                    this.$message.error('未选择课程')
                 }
 
-                return isJPG && isLt2M && name && author && introduction;
+                return isJPG && isLt2M && name && author && introduction && number;
+            },
+            handleCommand(command) {
+                this.csrf_token.classId = command;
+                for(let i in this.liList){
+                    if(this.liList[i].id == command){
+                        this.className = this.liList[i].class_name
+                        break;
+                    }
+                }
             }
 
 
@@ -160,6 +187,11 @@
         },
         mounted() {
 
+        },
+        created:function () {
+            axios.get('/admin/classlist').then(res=>{
+                this.liList = res.data.result;
+            })
         }
     }
 </script>

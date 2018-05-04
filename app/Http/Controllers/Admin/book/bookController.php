@@ -28,7 +28,7 @@ class bookController extends Controller
     {
 
         if ($request->isMethod('get')) {
-            if (!empty($request->page)) {
+            if (!empty($request->input('page'))) {
                 $data = $this->book->getList();
                 if (sizeof($data) > 0) {
                     return responseToJson(0, 'get page', $data);

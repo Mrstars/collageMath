@@ -10,7 +10,7 @@
         <el-upload
                 ref="upload"
                 class="avatar-uploader"
-                action="/admin/book/upload"
+                action="/admin/vedio/upload"
                 :data="csrf_token"
                 :show-file-list="false"
                 :on-success="uploadSuccess"
@@ -21,18 +21,32 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 
         </el-upload>
-        <el-form label-width="80px" :model="csrf_token">
+        <el-form label-width="80px" :model="csrf_token" style="width:50%; margin: 0 auto">
             <el-form-item label="名称">
                 <el-input v-model="csrf_token.name"></el-input>
             </el-form-item>
             <el-form-item label="作者">
-                <el-input v-model="csrf_token.book_author"></el-input>
+                <el-input v-model="csrf_token.vedio_author"></el-input>
             </el-form-item>
             <el-form-item label="简介">
-                <el-input v-model="csrf_token.book_introduction"></el-input>
+                <el-input v-model="csrf_token.vedio_introduction"></el-input>
+            </el-form-item>
+            <el-form-item label="链接">
+                <el-input v-model="csrf_token.link"></el-input>
+            </el-form-item>
+            <el-form-item label="课程">
+                <!--<el-input v-model="csrf_token.class"></el-input>-->
+                <el-dropdown trigger="click" @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{this.className}}<i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item v-for="(item, index) in this.liList" :key="liList.id" :command="item.id">{{item.class_name}}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
             </el-form-item>
         </el-form>
-        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传信息</el-button>
+        <el-button style="margin-left: 30%;" size="small" type="success" @click="submitUpload">上传信息</el-button>
     </div>
 </template>
 <style>
@@ -97,9 +111,11 @@
                 imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', vedio_author: '', vedio_introduction: '',link:''
+                    name: '', vedio_author: '', vedio_introduction: '',link:'',classId:0
                 },
-                judgeUpload:false
+                judgeUpload:false,
+                liList:[{id:0,name:'test'}],
+                className:'请选择课程'
 
             }
         },
@@ -135,19 +151,25 @@
                 const author = this.csrf_token.vedio_author != '';
                 const introduction = this.csrf_token.vedio_introduction != '';
                 const path = this.csrf_token.link != '';
+                const number = this.csrf_token.classId !=0
                 if (!isJPG) {
                     this.$message.error('上传头像图片只能是 JPG 格式!')
                 } else if (!isLt2M) {
                     this.$message.error('上传头像图片大小不能超过 2MB!');
                 } else if (!name) {
-                    this.$message.error('书名为空')
+                    this.$message.error('名称为空')
                 } else if (!author) {
                     this.$message.error('作者为空')
                 } else if (!introduction) {
                     this.$message.error('简介为空')
+                }else if(!number){
+                    this.$message.error('未选择课程')
+                }else if(!path){
+                    this.$message.error('链接为空')
                 }
 
-                return isJPG && isLt2M && name && author && introduction;
+
+                return isJPG && isLt2M && name && author && introduction && number && path;
             }, filechange(file) {
                 if(!this.judgeUpload)
                     this.imageUrl = URL.createObjectURL(file.raw);
@@ -156,12 +178,32 @@
                     this.judgeUpload = false;
                 }
             },
-            test(){
-
+            handleCommand(command) {
+                this.csrf_token.classId = command;
+                for(let i in this.liList){
+                    if(this.liList[i].id == command){
+                        this.className = this.liList[i].class_name
+                        break;
+                    }
+                }
             }
 
         },
         mounted() {
+        },
+        created:function () {
+            axios.get('/admin/classlist').then(res=>{
+                this.liList = res.data.result;
+            })
         }
     }
 </script>
+<style>
+    .el-dropdown-link {
+        cursor: pointer;
+        color: #409EFF;
+    }
+    .el-icon-arrow-down {
+        font-size: 12px;
+    }
+</style>

@@ -84,7 +84,6 @@ class pptController extends Controller
                                 DB::commit();
                                 return responseToJson(0, 'success');
                             } catch (\Exception $e) {
-
                                 DB::rollBack();
                                 return responseToJson(1, '出错啦',$e);
                             }

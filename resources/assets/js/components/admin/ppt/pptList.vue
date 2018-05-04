@@ -34,7 +34,17 @@
                 <el-form-item label="简介" style="width: 50%">
                     <el-input type="textarea" v-model="csrf_token.ppt_introduction" resize="none"></el-input>
                 </el-form-item>
-
+                <el-form-item label="课程" style="width: 50%">
+                    <!--<el-input v-model="csrf_token.class"></el-input>-->
+                    <el-dropdown trigger="click" @command="handleCommand" style="z-index: 10000">
+                      <span class="el-dropdown-link">
+                        {{this.className}}<i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-for="(item, index) in this.liList" :key="liList.id" :command="item.id">{{item.class_name}}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </el-form-item>
             </el-form>
             <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传信息</el-button>
         </el-dialog>
@@ -197,10 +207,11 @@
                 dlShow: false,
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', ppt_author: '', ppt_introduction: ''
+                    name: '', ppt_author: '', ppt_introduction: '',classId:0
                 },
                 judgeUpload: false,
-
+                liList:[{id:0,name:'test'}],
+                className:'请选择课程'
             }
         },
         methods: {
@@ -215,6 +226,9 @@
                         this.csrf_token.ppt_introduction = res.data.result.ppt_introduction;
                         this.csrf_token.oldFileName = res.data.result.ppt_path;
                         this.csrf_token.id = bookId;
+                        this.csrf_token.classId = res.data.result.class_id
+                        this.handleCommand(res.data.result.class_id)
+//                        this.getPage();
                     }
                 })
             },
@@ -286,6 +300,7 @@
                     this.csrf_token.ppt_author = ''
                     this.csrf_token.ppt_introduction = ''
                     this.dlShow = false;
+                    this.getPage()
                 }
                 else {
                     this.$message.error(res.msg)
@@ -319,10 +334,30 @@
                 }
 
                 return isJPG && isLt2M && name && author && introduction;
+            },
+            handleCommand(command) {
+                console.log(11)
+                this.csrf_token.classId = command;
+                for(let i in this.liList){
+                    if(this.liList[i].id == command){
+                        this.className = this.liList[i].class_name
+                        break;
+                    }
+                }
             }
         },
         mounted() {
             this.getPage()
+        },
+        created:function () {
+            axios.get('/admin/classlist').then(res=>{
+                this.liList = res.data.result;
+            })
         }
     }
 </script>
+<style>
+    .el-dropdown-menu{
+        z-index: 10000 !important;
+    }
+</style>

@@ -23,7 +23,36 @@ export default new VueRouter({
                 path: '/bookList',
             component: resolve =>void(require(['../components/wx/bookList.vue'], resolve))
 
-        }
+        },
+        {
+            name: "book",
+                path: '/book/:id',
+            component: resolve =>void(require(['../components/wx/book.vue'], resolve))
+        },
+        {
+            name:'pptList',
+            path:'/pptList',
+            component: resolve =>void(require(['../components/wx/pptList.vue'], resolve))
+        },
+        {
+            name:'ppt',
+                path:'/ppt/:id',
+            component: resolve =>void(require(['../components/wx/ppt.vue'], resolve))
+        },
+        {
+            name:'ppt',
+                path:'/ppt/:id',
+            component: resolve =>void(require(['../components/wx/ppt.vue'], resolve))
+        },{
+            name:'vedio',
+                path:'/vedio/:id',
+            component: resolve =>void(require(['../components/wx/vedio.vue'], resolve))
+        },
+{
+    name:'vediolist',
+        path:'/vedioList',
+    component: resolve =>void(require(['../components/wx/vedioList.vue'], resolve))
+}
     ]
 })
 

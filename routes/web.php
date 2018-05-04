@@ -29,3 +29,5 @@ Route::group(['middleware' => ['login.check']], function () {
     include('admin.php');
 });
 
+include ('wx.php');
+

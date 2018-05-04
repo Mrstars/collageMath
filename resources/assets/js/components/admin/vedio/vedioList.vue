@@ -13,7 +13,7 @@
 
                     ref="upload"
                     class="avatar-uploader"
-                    action="/admin/book/update"
+                    action="/admin/vedio/update"
                     :data="csrf_token"
                     :show-file-list="false"
                     :on-success="uploadSuccess"
@@ -25,16 +25,29 @@
 
             </el-upload>
             <el-form label-width="80px" :model="csrf_token">
-                <el-form-item label="名称" style="width: 50%">
+                <el-form-item label="名称">
                     <el-input v-model="csrf_token.name"></el-input>
                 </el-form-item>
-                <el-form-item label="作者" style="width: 50%">
-                    <el-input v-model="csrf_token.book_author"></el-input>
+                <el-form-item label="作者">
+                    <el-input v-model="csrf_token.vedio_author"></el-input>
                 </el-form-item>
-                <el-form-item label="简介" style="width: 50%">
-                    <el-input type="textarea" v-model="csrf_token.book_introduction" resize="none"></el-input>
+                <el-form-item label="简介">
+                    <el-input v-model="csrf_token.vedio_introduction"></el-input>
                 </el-form-item>
-
+                <el-form-item label="链接">
+                    <el-input v-model="csrf_token.link"></el-input>
+                </el-form-item>
+                <el-form-item label="课程">
+                    <!--<el-input v-model="csrf_token.class"></el-input>-->
+                    <el-dropdown trigger="click" @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{this.className}}<i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-for="(item, index) in this.liList" :key="liList.id" :command="item.id">{{item.class_name}}</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </el-form-item>
             </el-form>
             <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传信息</el-button>
         </el-dialog>
@@ -195,24 +208,30 @@
                 imageUrl: '',
                 csrf_token: {
                     '_token': $('meta[name="csrf"]').attr('content'),
-                    name: '', book_author: '', book_introduction: '',ifUpload:false,oldFileName:'',id:0
+                    name: '', vedio_author: '', vedio_introduction: '',ifUpload:false,oldFileName:'',id:0,classId:0,link:''
                 },
                 judgeUpload: false,
+                liList:[{id:0,name:'test'}],
+                className:'请选择课程'
 
             }
         },
         methods: {
             handleEdit(index, row) {
                 this.dlShow = true;
-                let bookId = this.tableData[index].id
-                axios.get('/admin/vedio/getVedio?id=' + bookId).then(res => {
+                let vedioId = this.tableData[index].id
+                axios.get('/admin/vedio/getVedio?id=' + vedioId).then(res => {
                     if (res.data.code == 0) {
-                        this.imageUrl = '/storage/avatars/'+res.data.result.book_img;
-                        this.csrf_token.name = res.data.result.book_name;
-                        this.csrf_token.book_author = res.data.result.book_author;
-                        this.csrf_token.book_introduction = res.data.result.book_introduction;
-                        this.csrf_token.oldFileName = res.data.result.book_img;
-                        this.csrf_token.id = bookId;
+                        this.imageUrl = '/storage/avatars/'+res.data.result.video_img;
+                        this.csrf_token.name = res.data.result.video_name;
+                        this.csrf_token.vedio_author = res.data.result.video_wirter;
+                        this.csrf_token.vedio_introduction = res.data.result.vedio_introduction;
+                        this.csrf_token.oldFileName = res.data.result.vedio_img;
+                        this.csrf_token.id = vedioId;
+                        this.csrf_token.link = res.data.result.video_path
+                        this.csrf_token.classId = res.data.result.class_id
+                        this.handleCommand(res.data.result.class_id)
+
                     }
                 })
             },
@@ -281,9 +300,11 @@
                     });
                     this.imageUrl = ''
                     this.csrf_token.name = ''
-                    this.csrf_token.book_author = ''
-                    this.csrf_token.book_introduction = ''
+                    this.csrf_token.vedio_author = ''
+                    this.csrf_token.vedio_introduction = ''
+                    this.csrf_token.link=''
                     this.dlShow = false;
+                    this.getPage()
                 }
                 else {
                     this.$message.error(res.msg)
@@ -295,8 +316,8 @@
                 const isJPG = file.type === 'image/jpeg';
                 const isLt2M = file.size / 1024 / 1024 < 2;
                 const name = this.csrf_token.name != '';
-                const author = this.csrf_token.book_author != '';
-                const introduction = this.csrf_token.book_introduction != '';
+                const author = this.csrf_token.vedio_author != '';
+                const introduction = this.csrf_token.vedio_introduction != '';
 
                 if (!isJPG) {
                     this.$message.error('上传头像图片只能是 JPG 格式!')
@@ -319,10 +340,30 @@
                     this.imageUrl = ""
                     this.judgeUpload = false;
                 }
+            },
+            handleCommand(command) {
+                console.log(11)
+                this.csrf_token.classId = command;
+                for(let i in this.liList){
+                    if(this.liList[i].id == command){
+                        this.className = this.liList[i].class_name
+                        break;
+                    }
+                }
             }
         },
         mounted() {
             this.getPage()
+        },
+        created:function () {
+            axios.get('/admin/classlist').then(res=>{
+                this.liList = res.data.result;
+            })
         }
     }
 </script>
+<style>
+    .el-dropdown-menu{
+        z-index: 10000 !important;
+    }
+</style>

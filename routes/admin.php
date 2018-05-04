@@ -2,6 +2,7 @@
 
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/menu/get', 'Admin\MenuController@get_menu');
+    Route::get('/classlist','Wx\book\bookController@getClassList');
     Route::group(['prefix' => 'weixin'], function () {
         Route::post("/config/set", 'Admin\WeixinController@set_config');
         Route::post("/config/get", 'Admin\WeixinController@get_config');
@@ -51,6 +52,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix'=>'vedio','namespace'=>'Admin\vedio'],function (){
         Route::get('getList','vedioController@getList');
         Route::post('delete','vedioController@delVedio');
+        Route::post('upload','vedioController@upload');
+        Route::post('update','vedioController@updateVedio');
+        Route::get('getVedio','vedioController@getVedio');
     });
 
 

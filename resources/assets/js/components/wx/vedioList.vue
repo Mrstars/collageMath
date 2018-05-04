@@ -2,7 +2,7 @@
     <div>
         <div style="width: 100%;height: 50px;background-color: #4d93db">
             <p style="width: 80px;height: 20px;margin: 18px 0 0 0;font-size: 13px;text-align: center;color: white;float: left">
-                教材列表</p>
+                视频列表</p>
             <p style="width: 80px;margin: 0 auto;height: 20px;padding: 15px 0;font-size: 15px;text-align: center;color: white">
                 魅力数学</p>
         </div>
@@ -78,7 +78,7 @@
                 testType: '0',
                 show2: false,
                 menus2: {
-                    menu1: '按浏览量排序',
+                    menu1: '按观看量排序',
                     menu2: '按时间排序',
                 }, show1: false,
                 menus1: ['全部'],
@@ -90,32 +90,32 @@
         },
         methods: {
             clickClass(key, val) {
-                this.page = parseInt(1);
-                if(key<this.list.length) {
+
+                if (key < this.list.length) {
                     this.oneClass = this.menus1List[key].id
-                    this.url = '/wx/getOneList?descCol=upload_time&type=' + this.oneClass + "&page=";
+                    this.url = '/wx/getOneVedioList?descCol=upload_time&type=' + this.oneClass + "&page=";
                     this.judge = 1
-                }else{
-                    this.judge = 0
-                    this.url = '/wx/booklist?descCol=' + this.descCol + '&page='
+                } else {
+                    this.url = '/wx/vedioList?descCol=' + this.descCol + '&page='
                 }
+                this.page = 1;
                 this.initSelect();
             },
             click(key, val) {
 
-                if (val == '按浏览量排序') {
-                    this.descCol = 'recommended'
+                if (val == '按观看量排序') {
+                    this.descCol = 'pageviews'
                     if (this.judge == 0) {
-                        this.url = '/wx/booklist?descCol=recommended&page='
+                        this.url = '/wx/vedioList?descCol=pageviews&page='
                     } else {
-                        this.url = '/wx/getOneList?descCol=recommended&type=' + this.oneClass + "&page=";
+                        this.url = '/wx/getOneVedioList?descCol=pageviews&type=' + this.oneClass + "&page=";
                     }
                 } else {
                     this.descCol = 'upload_time'
                     if (this.judge == 0) {
-                        this.url = '/wx/booklist?descCol=upload_time&page='
+                        this.url = '/wx/vedioList?descCol=upload_time&page='
                     } else {
-                        this.url = '/wx/getOneList?descCol=upload_time&type=' + this.oneClass + "&page=";
+                        this.url = '/wx/getOneVedioList?descCol=upload_time&type=' + this.oneClass + "&page=";
                     }
 
                 }
@@ -135,41 +135,6 @@
                 this.show1 = true;
             },
 
-//            timeInit(object, res) {
-//                if (res.data.code == 0) {
-//                    object.list = [{
-//                        id: 0,
-//                        src:'',
-//                        title: '',
-//                        desc: '',
-//                        url: '',
-//                        meta: {
-//                            source: '',
-//                            date: '',
-//                            other: ''
-//                        }
-//                    }]
-//
-//                    var arr = res.data.result.data;
-//                    for (let i in arr) {
-//                        object.initList_I(object, i);
-//                        object.list[i].id = arr[i].idmarch_news;
-//                        object.list[i].title = arr[i].book_name;
-//                        object.list[i].desc = arr[i].book_introduction;
-//                        object.list[i].url = "/newShow/" + arr[i].idmarch_news + '/' + this.testType;
-//                        object.list[i].meta.source = "发布者:" + arr[i].book_author;
-//                        object.list[i].meta.date = new Date(arr[i].upload_time).format("yyyy-MM-dd");
-//                        object.list[i].meta.other = "点击量:" + arr[i].recommended
-//
-//                    }
-//                } else if (res.data.code == 2) {
-//                    object.message = "暂无此时间段的新闻"
-//                    object.show = true;
-//                } else {
-//                    object.message = res.data.msg
-//                    object.show = true;
-//                }
-//            },
             onclickfooter() {
                 this.page++
                 axios.get(this.url + this.page).then(res => {
@@ -208,13 +173,14 @@
                             let j = length + parseInt(i);
                             this.initList_I(this, j);
                             this.list[j].id = arr[i].id;
-                            this.list[j].src = 'http://www.math.com/storage/avatars/' + arr[i].book_img;
-                            this.list[j].title = arr[i].book_name;
-                            this.list[j].desc = arr[i].book_introduction;
-                            this.list[j].url = "/book/" + arr[i].id;
-                            this.list[j].meta.source = "上传者:" + arr[i].book_author;
+                            this.list[j].src = 'http://www.math.com/storage/avatars/'+arr[i].video_img
+                            this.list[j].title = arr[i].video_name;
+                            this.list[j].desc = arr[i].vedio_introduction;
+                            this.list[j].url = "/ppt/" + arr[i].id;
+                            this.list[j].meta.source = "上传者:" + arr[i].video_wirter;
                             this.list[j].meta.date = new Date(arr[i].upload_time).format("yyyy-MM-dd");
-                            this.list[j].meta.other = "阅读量:" + arr[i].recommended
+                            this.list[j].meta.other = "观看量:" + arr[i].pageviews
+
                         }
                     } else if (res.data.code == 2) {
                         this.message = "已经到底了"
@@ -257,20 +223,21 @@
                             }
                         }]
 
+                        console.log(res)
                         var arr = res.data.result.data;
                         for (let i in arr) {
                             this.initList_I(this, i);
                             this.list[i].id = arr[i].id;
-                            this.list[i].src = 'http://www.math.com/storage/avatars/' + arr[i].book_img;
-                            this.list[i].title = arr[i].book_name;
-                            this.list[i].desc = arr[i].book_introduction;
-                            this.list[i].url = "/book/" + arr[i].id;
-                            this.list[i].meta.source = "上传者:" + arr[i].book_author;
+                            this.list[i].src = 'http://www.math.com/storage/avatars/'+arr[i].video_img
+                            this.list[i].title = arr[i].video_name;
+                            this.list[i].desc = arr[i].video_introduction;
+                            this.list[i].url = "/vedio/" + arr[i].id;
+                            this.list[i].meta.source = "上传者:" + arr[i].video_wirter;
                             this.list[i].meta.date = new Date(arr[i].upload_time).format("yyyy-MM-dd");
-                            this.list[i].meta.other = "阅读量:" + arr[i].recommended
+                            this.list[i].meta.other = "观看量:" + arr[i].pageviews
 
                         }
-                    }else if (res.data.code == 2 ){
+                    }else if(res.data.code == 2){
                         this.list = [{
                             id: 0,
                             src: '',
@@ -283,8 +250,8 @@
                                 other: ''
                             }
                         }]
-                        this.message = "无数据"
-                        this.show = true;
+                        this.message = "暂无数据"
+                        this.show = true
                     }
                 })
             }
@@ -294,7 +261,7 @@
         created: function () {
         },
         mounted: function () {
-            this.url = '/wx/booklist?descCol=' + this.descCol + '&page='
+            this.url = '/wx/vedioList?descCol=' + this.descCol + '&page='
             this.initSelect();
             axios.get('/wx/classlist').then(res => {
                 this.menus1List = res.data.result
