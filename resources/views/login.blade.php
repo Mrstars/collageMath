@@ -167,7 +167,7 @@
     </div>
 </div>
 <div class="footer">
-    <a target="_blank" href="http://gammainfo.com">@技术支持 特觅科</a>
+    <a target="_blank" href="http://gammainfo.com">@计科144 陈亚平</a>
 </div>
 
 </body>
